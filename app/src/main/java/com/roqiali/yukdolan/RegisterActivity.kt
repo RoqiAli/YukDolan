@@ -1,27 +1,31 @@
 package com.roqiali.yukdolan
 
+import android.Manifest.permission.READ_CONTACTS
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_register.*
 
 /**
  * A login screen that offers login via email/password.
  */
-class LoginActivity : AppCompatActivity() {
-
+class RegisterActivity : AppCompatActivity() {
+    //private var mAuthTask: UserLoginTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_register)
         // Set up the login form.
+        //populateAutoComplete()
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
@@ -33,6 +37,22 @@ class LoginActivity : AppCompatActivity() {
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
+    private fun mayRequestContacts(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true
+        }
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
+            Snackbar.make(email, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok,
+                            { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
+        } else {
+            requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS)
+        }
+        return false
+    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -40,11 +60,9 @@ class LoginActivity : AppCompatActivity() {
      * errors are presented and no actual login attempt is made.
      */
     private fun attemptLogin() {
-/*
-        if (mAuthTask != null) {
+/*        if (mAuthTask != null) {
             return
-        }
-*/
+        }*/
 
         // Reset errors.
         email.error = null
@@ -83,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            /*mAuthTask = UserLoginTask(emailStr, passwordStr)
+/*            mAuthTask = UserLoginTask(emailStr, passwordStr)
             mAuthTask!!.execute(null as Void?)*/
         }
     }
@@ -137,9 +155,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-
         private val REQUEST_READ_CONTACTS = 0
-
         private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
     }
 }
