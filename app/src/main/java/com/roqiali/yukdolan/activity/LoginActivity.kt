@@ -1,4 +1,4 @@
-package com.roqiali.yukdolan
+package com.roqiali.yukdolan.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -7,15 +7,22 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.text.SpannableString
 import android.text.TextUtils
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.roqiali.yukdolan.R
 import kotlinx.android.synthetic.main.activity_login.*
 
 /**
@@ -29,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
     private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
@@ -45,7 +53,13 @@ class LoginActivity : AppCompatActivity() {
 
         email_sign_in_button.setOnClickListener { attemptLogin() }
 
-        btnToRegister.setOnClickListener {
+        val spannableString = SpannableString("Belum punya akun? Yuk Daftar.")
+        spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(applicationContext, R.color.colorPrimaryTextDefaultMaterialLight)), 18, 29, 0)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), 18, 29, 0)
+        spannableString.setSpan(BackgroundColorSpan(ContextCompat.getColor(applicationContext, R.color.colorAccent)), 18, 29, 0)
+        tvToRegister.text = spannableString
+
+        tvToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }

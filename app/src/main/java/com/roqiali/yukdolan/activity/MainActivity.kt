@@ -1,4 +1,4 @@
-package com.roqiali.yukdolan
+package com.roqiali.yukdolan.activity
 
 import android.content.Context
 import android.os.Bundle
@@ -7,15 +7,13 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import com.roqiali.yukdolan.R
 import com.roqiali.yukdolan.fragment.HomeFragment
 import com.roqiali.yukdolan.fragment.PlaceFragment
 import com.roqiali.yukdolan.fragment.ProfileFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
-    private var nameSp = "NAME"
-    private var emailSp = "EMAIL"
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -40,8 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         addFragment(HomeFragment(), R.id.frame)
         val pref = applicationContext.getSharedPreferences("YukDolanPref", Context.MODE_PRIVATE)
-/*        nameSp = pref.getString("nameKey", "")
-        emailSp = pref.getString("emailKey", "")
+/*
 
         nama.text = nameSp
         email.text = emailSp*/

@@ -16,7 +16,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">Beranda</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_profile">Profil</string>
     <string name="prompt_repassword">Re-password</string>
     <string name="action_sign_up">Daftar</string>
     <string name="title_place">Lokasi</string>
@@ -114,4 +114,5 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
