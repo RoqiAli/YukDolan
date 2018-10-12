@@ -55,7 +55,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item.itemId == android.R.id.home)
+        if (item?.itemId == android.R.id.home)
             onBackPressed()
         return super.onOptionsItemSelected(item)
     }

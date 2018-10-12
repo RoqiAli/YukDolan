@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.roqiali.yukdolan.R
 import com.roqiali.yukdolan.activity.LoginActivity
-import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.fragment_profile.view.*
 
 
