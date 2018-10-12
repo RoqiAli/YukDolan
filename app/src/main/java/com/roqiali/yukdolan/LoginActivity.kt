@@ -2,7 +2,11 @@ package com.roqiali.yukdolan
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -10,6 +14,8 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_login.*
 
 /**
@@ -17,6 +23,10 @@ import kotlinx.android.synthetic.main.activity_login.*
  */
 class LoginActivity : AppCompatActivity() {
 
+    private val nameS = "nameKey"
+    private val emailS = "emailKey"
+    var mFirebaseAuth = FirebaseAuth.getInstance()
+    private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +40,14 @@ class LoginActivity : AppCompatActivity() {
             false
         })
 
+        mFirebaseAuth = FirebaseAuth.getInstance()
+        sharedPreferences = this.getSharedPreferences("YukDolanPref", Context.MODE_PRIVATE)
+
         email_sign_in_button.setOnClickListener { attemptLogin() }
+
+        btnToRegister.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
     }
 
 
@@ -83,9 +100,20 @@ class LoginActivity : AppCompatActivity() {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            /*mAuthTask = UserLoginTask(emailStr, passwordStr)
-            mAuthTask!!.execute(null as Void?)*/
+            signIn(emailStr, passwordStr)
         }
+    }
+
+    private fun signIn(email: String, password: String) {
+        mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val user = mFirebaseAuth.currentUser
+                        showUser(user!!)
+                    } else {
+                        showProgress(false)
+                    }
+                }
     }
 
     private fun isEmailValid(email: String): Boolean {
@@ -101,6 +129,7 @@ class LoginActivity : AppCompatActivity() {
     /**
      * Shows the progress UI and hides the login form.
      */
+    @SuppressLint("ObsoleteSdkInt")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private fun showProgress(show: Boolean) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
@@ -136,10 +165,25 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
+    private fun showUser(user: FirebaseUser) {
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        val name = user.displayName
+        val email = user.email
 
-        private val REQUEST_READ_CONTACTS = 0
+        val editor = sharedPreferences!!.edit()
+        editor.putString(nameS, name)
+        editor.putString(emailS, email)
+        editor.apply()
+        startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        finish()
+    }
 
-        private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
+    override fun onStart() {
+        super.onStart()
+        val currentUser = mFirebaseAuth.currentUser
+        if (currentUser!=null){
+            showUser(currentUser)
+        }
     }
 }

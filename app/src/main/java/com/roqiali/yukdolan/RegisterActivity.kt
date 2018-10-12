@@ -1,79 +1,79 @@
 package com.roqiali.yukdolan
 
-import android.Manifest.permission.READ_CONTACTS
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.android.synthetic.main.activity_register.*
+
 
 /**
  * A login screen that offers login via email/password.
  */
 class RegisterActivity : AppCompatActivity() {
+    private val TAG = "EmailPassword"
     //private var mAuthTask: UserLoginTask? = null
+
+    private val nameS = "nameKey"
+    private val emailS = "emailKey"
+
+    var fbAuth = FirebaseAuth.getInstance()
+    private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        // Set up the login form.
-        //populateAutoComplete()
+
+        sharedPreferences = this.getSharedPreferences("YukDolanPref", Context.MODE_PRIVATE)
+
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                attemptLogin()
+                attemptRegister()
                 return@OnEditorActionListener true
             }
             false
         })
 
-        email_sign_in_button.setOnClickListener { attemptLogin() }
+        email_sign_up_button.setOnClickListener { attemptRegister() }
     }
 
-    private fun mayRequestContacts(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(email, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok,
-                            { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
-        } else {
-            requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS)
-        }
-        return false
-    }
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
-    private fun attemptLogin() {
-/*        if (mAuthTask != null) {
-            return
-        }*/
-
-        // Reset errors.
+    private fun attemptRegister() {
         email.error = null
         password.error = null
+        username.error = null
 
-        // Store values at the time of the login attempt.
         val emailStr = email.text.toString()
         val passwordStr = password.text.toString()
+        val userStr = username.text.toString()
 
         var cancel = false
         var focusView: View? = null
+
+        if (TextUtils.isEmpty(passwordStr)) {
+            password.error = getString(R.string.error_field_required)
+            focusView = password
+            cancel = true
+        }
+
+        if (TextUtils.isEmpty(userStr)) {
+            username.error = getString(R.string.error_field_required)
+            focusView = username
+            cancel = true
+        }
+
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
@@ -94,15 +94,10 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView?.requestFocus()
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true)
-/*            mAuthTask = UserLoginTask(emailStr, passwordStr)
-            mAuthTask!!.execute(null as Void?)*/
+            signUp(userStr, emailStr, passwordStr)
         }
     }
 
@@ -113,12 +108,10 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun isPasswordValid(password: String): Boolean {
         //TODO: Replace this with your own logic
-        return password.length > 4
+        return password.length > 6
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
+    @SuppressLint("ObsoleteSdkInt")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private fun showProgress(show: Boolean) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
@@ -151,6 +144,50 @@ class RegisterActivity : AppCompatActivity() {
             // and hide the relevant UI components.
             login_progress.visibility = if (show) View.VISIBLE else View.GONE
             login_form.visibility = if (show) View.GONE else View.VISIBLE
+        }
+    }
+
+    private fun signUp(userName: String, email: String, password: String) {
+        fbAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val user = fbAuth.currentUser
+                        val profileChangeRequest = UserProfileChangeRequest.Builder()
+                                .setDisplayName(userName).build()
+                        user!!.updateProfile(profileChangeRequest).addOnCompleteListener { tasks ->
+                            if (tasks.isSuccessful) {
+                                val newUser = fbAuth.currentUser
+                                showUser(newUser!!)
+                            } else {
+                                showProgress(false)
+                            }
+                        }
+                    } else {
+                        showProgress(false)
+                    }
+                }
+
+    }
+
+    private fun showUser(user: FirebaseUser) {
+        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+        val name = user.displayName
+        val email = user.email
+
+        val editor = sharedPreferences!!.edit()
+        editor.putString(nameS, name)
+        editor.putString(emailS, email)
+        editor.apply()
+        startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        finish()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = fbAuth.currentUser
+        if (currentUser!=null){
+            showUser(currentUser)
         }
     }
 

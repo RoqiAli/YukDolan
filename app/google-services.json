@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "249798600089",
+    "firebase_url": "https://yukdolan-8abef.firebaseio.com",
+    "project_id": "yukdolan-8abef",
+    "storage_bucket": "yukdolan-8abef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249798600089:android:03b93d9e97215c07",
+        "android_client_info": {
+          "package_name": "com.roqiali.yukdolan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "249798600089-771p2afeqnq5cdhdml7ci42cfc3hq2dq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.roqiali.yukdolan",
+            "certificate_hash": "3894d493cf7a797d27e6b8164f433e5b70c34d4e"
+          }
+        },
+        {
+          "client_id": "249798600089-0hptku457as0eq8grt0cbo4a179eo6a1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwwN42bNzIt4jR9uGzJ5CFC6RodJgjxeI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "249798600089-0hptku457as0eq8grt0cbo4a179eo6a1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
